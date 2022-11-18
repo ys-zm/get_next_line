@@ -40,10 +40,10 @@ char	*ft_strjoin_gnl(char *line, char *buf, size_t end)
 	size_t	start;
 
 	start = 0;
-	if (ft_strlen(buf) == 0)
+	if (!check_empty_file(line, buf))
 		return (NULL);
 	i = 0;
-	ext_line = malloc(sizeof(char) * (ft_strlen(line) + ft_strlen(buf) + 1));
+	ext_line = malloc(sizeof(char) * (ft_strlen(line) + end + 1));
 	if (!ext_line)
 		return (NULL);
 	while (line && line[i])
@@ -51,10 +51,27 @@ char	*ft_strjoin_gnl(char *line, char *buf, size_t end)
 		ext_line[i] = line[i];
 		i++;
 	}
-	while (buf[start] && start <= end)
+	while (buf[start] && start < end)
 		ext_line[i++] = buf[start++];
 	ext_line[i] = '\0';
 	if (line)
 		free(line);
 	return (ext_line);
+}
+
+char	*ft_strsplit_gnl(char *excess, char *buf, size_t start)
+{
+	char	*rem;
+	size_t	i;
+
+	i = 0;
+	rem = malloc(sizeof(char) * (ft_strlen(buf) - start + 2));
+	if (!rem)
+		return (NULL);
+	while (buf[start] != 0)
+		rem[i++] = buf[start++];
+	rem[i] = '\0';
+	if (excess)
+		free(excess);
+	return (rem);
 }

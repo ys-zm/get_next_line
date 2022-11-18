@@ -12,6 +12,7 @@
 
 #include "get_next_line.h"
 #include <stdio.h>
+#include <limits.h>
 
 size_t	check_pos_nl(char *buf)
 {
@@ -20,115 +21,97 @@ size_t	check_pos_nl(char *buf)
 	i = 0;
 	while (buf[i] != '\n' && buf[i] != '\0')
 		i++;
+	if (buf[i] == '\n')
+		i++;
 	return (i);
 }
 
-//check if null terminator is before buffer is full
-//check if '\n' '\0' (last nl char)
-//len of buf is smaller than buf_size
-size_t	check_end(char *buf)
+char	*get_excess(char *excess, char *buf, size_t pos)
 {
-	if (check_pos_nl(buf) == ft_strlen(buf) && ft_strlen(buf) < BUFFER_SIZE )
-		return (1);
-	return (0);
+	char	*temp;
+	temp = ft_strsplit_gnl(excess, buf, pos);
+	if (!temp)
+			return (NULL);
+	return (temp);
 }
 
-void	move_chars(char *buf, size_t i)
+char *get_line(char *line, char *excess, char *buf, size_t pos)
 {
-	size_t	x;
-
-	x = i;
-	while (buf[i] != 0)
-	{
-		buf[i - x] = buf[i];
-		i++;
+	if (excess)
+	{	line = ft_strjoin_gnl(line, excess, ft_strlen(excess));
+		free(excess);
+		if (!line)
+			return (NULL);
 	}
-	buf[i - x] = '\0';
-}
-
-static ssize_t	extract_line(char **line, char *buf)
-{
-	size_t	new_line;
-
-	new_line = check_pos_nl(buf);
-	// printf("%zu", new_line);
-	*line = ft_strjoin_gnl(*line, buf, new_line);
+	line = ft_strjoin_gnl(line, buf, pos);
 	if (!line)
-		return (-1);
-	if (new_line == BUFFER_SIZE && BUFFER_SIZE != 1)
-		return (0);
-	else
-	{
-		move_chars(buf, (new_line + 1));
-		return (1);
-	}
+		return (NULL);
+	return (line);
 }
 
+char	*extract_line(int fd, char *line, char **excess, char *buf)
+{
+	size_t	pos;
+	ssize_t	r;
+	
+	r = 1;
+	while (r)
+	{
+		r = read(fd, buf, BUFFER_SIZE);
+		buf[r] = '\0';
+		pos = check_pos_nl(buf);
+		if (pos == BUFFER_SIZE)
+			line = get_line(line, *excess, buf, pos);
+		else
+		{
+			line = get_line(line, *excess, buf, pos);
+			*excess = get_excess(*excess, buf, pos);
+			//printf("%s\n", *excess);
+			return (line);
+		}
+	}
+	return (NULL);	
+}
 
 char	*get_next_line(int fd)
 {
-	char			*line;
-	static char		buf[BUFFER_SIZE + 1];
-	ssize_t			r;
-	int				status;
-	static ssize_t	sof;
+	static char	*excess = NULL;
+	char		*line;
+	char		*buf;
 
-	// if (! buf)
-	// {
-	// 	*(buf + BUFFER_SIZE) = '\0';
-	// }
-	//buf[0] = 0;
-	buf[BUFFER_SIZE] = 0;
 	line = NULL;
-	sof = 1;
-	if (fd < 0 || BUFFER_SIZE < 1)
+	if (fd < 0 || BUFFER_SIZE < 1 || BUFFER_SIZE > 2147483647)
 		return (NULL);
-	while (1)
-	{
-		if (ft_strlen(buf) == 0 || sof == 1)
-		{
-			r = read(fd, buf, BUFFER_SIZE);
-			buf[r] = '\0';
-			sof = 0;
-		}
-		if (r < 0 || r == 0)
-			return (NULL);
-		status = extract_line(&line, buf);
-		if (status == 1)
-			return (line);
-		// else if (status == -1)
-		// {
-		// 	if (line)
-		// 		free(line);
-		// 	return (NULL);
-		// }
-		
-	}
+	buf = malloc(sizeof(char) * (BUFFER_SIZE + 1));
+	if (!buf)
+		return (NULL);
+	buf[BUFFER_SIZE] = '\0';		
+	line = extract_line(fd, line, &excess, buf);
+	if (buf)
+		free(buf);
+	return (line);
 }
 
-void	ft_write_line(char *str)
-{
-	size_t	size;
 
-	size = ft_strlen(str);
-	write(1, str, size);
-}
 
-int	main(void)
-{
-	int	fd;
-	int	i;
-	char *line;
+// int	main(void)
+// {
+// 	int	fd;
+// 	int	i;
+// 	char *line;
 	
-	fd = open("file2", O_RDONLY);
-	i = 0;
-	while (line)
-	{
-	line = get_next_line(fd);
-	printf("%s", line);
-	i++;
-	}
+// 	fd = open("file", O_RDONLY);
+// 	i = 0;
+// 	line = get_next_line(fd);
+// 	printf("%s", line);
+// 	line = get_next_line(fd);
+// 	printf("%s", line);
+// 	// while (line)
+// 	// {
+// 	// line = get_next_line(fd);
+// 	// printf("%s", line);
+// 	// }
 	
-	close(fd);
-}
+// 	close(fd);
+// }
 
