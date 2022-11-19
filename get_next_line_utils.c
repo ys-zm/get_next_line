@@ -65,7 +65,7 @@ char	*ft_strsplit_gnl(char *excess, char *buf, size_t start)
 	size_t	i;
 
 	i = 0;
-	rem = malloc(sizeof(char) * (ft_strlen(buf) - start + 2));
+	rem = malloc(sizeof(char) * (ft_strlen(buf) - start + 1));
 	if (!rem)
 		return (NULL);
 	while (buf[start] != 0)

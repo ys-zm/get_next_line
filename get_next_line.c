@@ -40,8 +40,6 @@ char *get_line(char *line, char *excess, char *buf, size_t pos)
 	if (excess)
 	{	line = ft_strjoin_gnl(line, excess, ft_strlen(excess));
 		free(excess);
-		if (!line)
-			return (NULL);
 	}
 	line = ft_strjoin_gnl(line, buf, pos);
 	if (!line)
@@ -60,6 +58,7 @@ char	*extract_line(int fd, char *line, char **excess, char *buf)
 		r = read(fd, buf, BUFFER_SIZE);
 		buf[r] = '\0';
 		pos = check_pos_nl(buf);
+		//printf("%zu\n", pos);
 		if (pos == BUFFER_SIZE)
 			line = get_line(line, *excess, buf, pos);
 		else
@@ -87,6 +86,7 @@ char	*get_next_line(int fd)
 		return (NULL);
 	buf[BUFFER_SIZE] = '\0';		
 	line = extract_line(fd, line, &excess, buf);
+	//printf("| excess: %s|\n", excess);
 	if (buf)
 		free(buf);
 	return (line);
@@ -102,15 +102,13 @@ char	*get_next_line(int fd)
 	
 // 	fd = open("file", O_RDONLY);
 // 	i = 0;
-// 	line = get_next_line(fd);
-// 	printf("%s", line);
-// 	line = get_next_line(fd);
-// 	printf("%s", line);
-// 	// while (line)
-// 	// {
 // 	// line = get_next_line(fd);
 // 	// printf("%s", line);
-// 	// }
+// 	while (i++ < 3)
+// 	{
+// 	line = get_next_line(fd);
+// 	printf("%s", line);
+// 	}
 	
 // 	close(fd);
 // }
