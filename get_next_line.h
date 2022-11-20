@@ -17,13 +17,14 @@
 #include <stdio.h>
 #include <unistd.h>
 #include <fcntl.h>
+#include <string.h>
 
-// #ifdef BUFFER_SIZE > 22736451278
+// #ifdef BUFFER_SIZE > MAX_INT - 1
 // #undef BUFFER_SIZE
-// #define BUFFER_SIZE 37456827
+// #define BUFFER_SIZE MAX_INT - 1
 // #endif
 #ifndef BUFFER_SIZE
-#define BUFFER_SIZE 1 
+#define BUFFER_SIZE 42
 #endif
 
 // typedef struct s_list
@@ -36,9 +37,9 @@
 
 char	*get_next_line(int fd);
 
-char	*ft_strjoin_gnl( char *line, char *buf, size_t end);
+char	*ft_strjoin_gnl(char *line, char *buf);
 
-char	*ft_strsplit_gnl(char *excess, char *buf, size_t start);
+char	*ft_strsplit_gnl(char *excess, size_t start, size_t end);
 
 size_t	ft_strlen(char *str);
 
