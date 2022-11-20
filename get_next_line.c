@@ -19,66 +19,72 @@ size_t	check_pos_nl(char *buf)
 	size_t	i;
 
 	i = 0;
-	while (buf[i] != '\n' && buf[i] != '\0')
+	while (buf && buf[i] != '\n' && buf[i] != '\0')
 		i++;
 	if (buf[i] == '\n')
 		i++;
 	return (i);
 }
 
-char	*cut_excess(char *excess, size_t pos, size_t ex_size)
+char	*cut_rem(char *rem, size_t pos, size_t rem_len)
 {
-	char *temp;
+	char *str;
 
-	temp = ft_strsplit_gnl(excess, pos, ex_size);
-	free(excess);
-	return (temp);
+	str = ft_strdup_gnl(rem, pos, rem_len);
+	free(rem);
+	return (str);
 }
 
-void	gnl_free(char *str)
+char	*read_error(char *line, char *rem, char *buf)
 {
-	free(str);
-	str = NULL;
+	free(line);
+	free(rem);
+	free(buf);
+	line = NULL;
+	rem = NULL;
+	buf = NULL;
+	return (line);
 }
 
-char	*extract_line(int fd, char **line, char *excess, char *buf)
+void	read_rem(size_t *pos, size_t *rem_len, char *rem)
+{
+	*pos = check_pos_nl(rem);
+	*rem_len  = ft_strlen(rem);
+}
+
+char	*append_buf(int fd, char **line, char *rem, char *buf)
 {
 	size_t	pos;
 	ssize_t	r;
-	size_t	ex_size;
+	size_t	rem_len;
 	
 	r = -2;
-	while ((excess && *excess) || r == -2)
+	while ((rem && *rem) || r == -2)
 	{
-		r = read(fd, buf, BUFFER_SIZE); //read protection
-		buf[r] = '\0';
+		r = read(fd, buf, BUFFER_SIZE); 
 		if (r == -1)
-		{
-			gnl_free(excess);
-			gnl_free(excess);
-			return (NULL);
-		}
+			read_error(*line, rem, buf);
+		buf[r] = '\0';
 		if (r > 0)
-			excess = ft_strjoin_gnl(excess, buf);
-		if (excess && *excess)
+			rem = ft_strjoin_gnl(rem, buf);
+		if (rem && *rem)
 		{
-			pos = check_pos_nl(excess);
-			ex_size = ft_strlen(excess);
-			if ((excess && excess[pos - 1] == '\n') || r == 0)
+			read_rem(&pos, &rem_len, rem);
+			if ((rem[pos - 1] == '\n') || r == 0)
 			{
-				*line = ft_strsplit_gnl(excess, 0, pos);
-				excess = cut_excess(excess, pos, ex_size);
-				return (excess);
+				*line = ft_strdup_gnl(rem, 0, pos);
+				rem = cut_rem(rem, pos, rem_len);
+				return (rem);
 			}
 		}
 	}
-	free(excess);
+	free(rem);
 	return (NULL);	
 }
 
 char	*get_next_line(int fd)
 {
-	static char	*excess = NULL;
+	static char	*rem = NULL;
 	char		*line;
 	char		*buf;
 
@@ -89,16 +95,10 @@ char	*get_next_line(int fd)
 	if (!buf)
 		return (NULL);
 	buf[BUFFER_SIZE] = '\0';		
-	excess = extract_line(fd, &line, excess, buf);
-	if (line && !*line)
-		gnl_free(line);
-	// if (excess && !*excess)
-	// {
-	// 	free(excess);
-	// 	excess = NULL;
-	// }
-	if (buf)
-		free(buf);
+	rem = append_buf(fd, &line, rem, buf);
+	if (line && ! *line)
+		read_error(line, rem, buf);
+	free(buf);
 	return (line);
 }
 

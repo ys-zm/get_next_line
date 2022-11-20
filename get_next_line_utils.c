@@ -1,7 +1,7 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        ::::::::            */
-/*   get_next_line_utils.c                              :+:    :+:            */
+/*   get_njoined_utils.c                              :+:    :+:            */
 /*                                                     +:+                    */
 /*   By: yzaim <marvin@codam.nl>                      +#+                     */
 /*                                                   +#+                      */
@@ -16,66 +16,68 @@
 size_t	ft_strlen(char *str)
 {
 	size_t	count;
+	size_t	i;
 
+	i = 0;
 	count = 0;
-	while (str && *str++)
+	while (str && str[i++])
 		count++;
 	return (count);
 }
 
-static size_t	check_empty_file(char *line, char *buf)
+static size_t	check_empty_file(char *str, char *buf)
 {
 	size_t	sum;
 
-	sum = ft_strlen(line) + ft_strlen(buf);
+	sum = ft_strlen(str) + ft_strlen(buf);
 	if (sum)
 		return (1);
 	return (0);
 }
 
-char	*ft_strjoin_gnl(char *line, char *buf)
+char	*ft_strjoin_gnl(char *str, char *buf)
 {
-	char	*ext_line;
+	char	*joined;
 	size_t	i;
 	size_t	start;
 
 	start = 0;
 	i = 0;
-	if (!check_empty_file(line, buf))
+	if (!check_empty_file(str, buf))
 		return (NULL);
-	ext_line = malloc(sizeof(char) * (ft_strlen(line) + ft_strlen(buf) + 1));
-	if (!ext_line)
+	joined = malloc(sizeof(char) * (ft_strlen(str) + ft_strlen(buf) + 1));
+	if (!joined)
 		return (NULL);
-	while (line && line[i])
+	while (str && str[i])
 	{
-		ext_line[i] = line[i];
+		joined[i] = str[i];
 		i++;
 	}
 	while (buf && buf[start])
-		ext_line[i++] = buf[start++];
-	ext_line[i] = '\0';
-	if (line)
-		free(line);
-	return (ext_line);
+		joined[i++] = buf[start++];
+	joined[i] = '\0';
+	if (str)
+		free(str);
+	return (joined);
 }
 
-char	*ft_strsplit_gnl(char *excess, size_t start, size_t end)
+char	*ft_strdup_gnl(char *str, size_t start, size_t end)
 {
-	char	*rem;
+	char	*dup;
 	size_t	i;
 
-	if (!excess)
+	if (!str)
 		return (NULL);
 	i = 0;
-	rem = malloc(sizeof(char) * (end - start + 1));
-	if (!rem)
+	dup = malloc(sizeof(char) * (end - start + 1));
+	if (!dup)
 		return (NULL);
-	while (excess[start] && start < end)
+	while (str[start] && start < end)
 	{
-		rem[i] = excess[start];
+		dup[i] = str[start];
 		i++;
 		start++;
 	}
-	rem[i] = '\0';
-	return (rem);
+	dup[i] = '\0';
+	return (dup);
 }

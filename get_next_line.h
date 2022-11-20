@@ -24,7 +24,7 @@
 // #define BUFFER_SIZE MAX_INT - 1
 // #endif
 #ifndef BUFFER_SIZE
-#define BUFFER_SIZE 42
+#define BUFFER_SIZE 10
 #endif
 
 // typedef struct s_list
@@ -39,7 +39,7 @@ char	*get_next_line(int fd);
 
 char	*ft_strjoin_gnl(char *line, char *buf);
 
-char	*ft_strsplit_gnl(char *excess, size_t start, size_t end);
+char	*ft_strdup_gnl(char *str, size_t start, size_t end);
 
 size_t	ft_strlen(char *str);
 
