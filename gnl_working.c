@@ -26,22 +26,12 @@ size_t	check_pos_nl(char *buf)
 	return (i);
 }
 
-size_t	check_char(char c, char *str)
-{
-	while (str && *str)
-	{
-		if (*str == c)
-			return (1);
-	}
-	return (0);
-}
-
-char	*cut_store(char *store, size_t pos, size_t store_len)
+char	*cut_rem(char *rem, size_t pos, size_t rem_len)
 {
 	char *str;
 
-	str = ft_strdup_gnl(store, pos, store_len);
-	free(store);
+	str = ft_strdup_gnl(rem, pos, rem_len);
+	free(rem);
 	return (str);
 }
 
@@ -56,40 +46,45 @@ char	*ft_free_null(char **line, char **rem, char **buf)
 	return (NULL);
 }
 
-char	*append_buf(int fd, char *store, char *buf)
+void	read_rem(size_t *pos, size_t *rem_len, char *rem)
 {
-	ssize_t	read_ret;
-	
-	read_ret = 1;
-	while (read_ret)
-	{
-		read_ret = read(fd, buf, BUFFER_SIZE); 
-		if (read_ret == -1)
-			return (NULL);
-		buf[read_ret] = '\0';
-		store = ft_strjoin_gnl(store, buf);
-		if (check_char('\n', buf))
-			return (store);
-	}
-	return (store);	
+	*pos = check_pos_nl(rem);
+	*rem_len  = ft_strlen(rem);
 }
 
-char	*find_line(char **store)
+char	*append_buf(int fd, char **line, char *rem, char *buf)
 {
 	size_t	pos;
-	size_t	store_len;
-	char	*line;
-
-	pos = check_pos_nl(*store);
-	store_len = ft_strlen(*store);
-	line = ft_strdup_gnl(*store, 0, pos);
-	*store = cut_store(*store, pos, store_len);
-	return (line);
+	ssize_t	r;
+	size_t	rem_len;
+	
+	r = -2;
+	while ((rem && *rem) || r == -2)
+	{
+		r = read(fd, buf, BUFFER_SIZE); 
+		if (r == -1)
+			return(ft_free_null(line, &rem, &buf));
+		buf[r] = '\0';
+		if (r > 0)
+			rem = ft_strjoin_gnl(rem, buf);
+		if (rem && *rem)
+		{
+			read_rem(&pos, &rem_len, rem);
+			if ((rem[pos - 1] == '\n') || r == 0)
+			{
+				*line = ft_strdup_gnl(rem, 0, pos);
+				rem = cut_rem(rem, pos, rem_len);
+				return (rem);
+			}
+		}
+	}
+	free(rem);
+	return (NULL);	
 }
 
 char	*get_next_line(int fd)
 {
-	static char	*store = NULL;
+	static char	*rem = NULL;
 	char		*line;
 	char		*buf;
 
@@ -100,28 +95,27 @@ char	*get_next_line(int fd)
 	if (!buf)
 		return (NULL);
 	buf[BUFFER_SIZE] = '\0';		
-	store = append_buf(fd, store, buf);
-	if (!store)
-		ft_free_null(&line, &store, &buf);
-	line = find_line(&store);
+	rem = append_buf(fd, &line, rem, buf);
+	if (line && !*line)
+		ft_free_null(&line, &rem, &buf);
 	free(buf);
 	return (line);
 }
 
-int	main(void)
-{
-	int	fd;
-	int	i;
-	char *line;
+// int	main(void)
+// {
+// 	int	fd;
+// 	int	i;
+// 	char *line;
 	
-	fd = open("file", O_RDONLY);
-	i = 0;
+// 	fd = open("file", O_RDONLY);
+// 	i = 0;
 
-	while (i++ < 4)
-	{
-	line = get_next_line(fd);
-	printf("%s\n", line);
-	}
+// 	while (i++ < 4)
+// 	{
+// 	line = get_next_line(fd);
+// 	printf("%s\n", line);
+// 	}
 	
-	close(fd);
-}
+// 	close(fd);
+// }
