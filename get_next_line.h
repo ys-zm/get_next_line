@@ -24,7 +24,7 @@
 // #define BUFFER_SIZE MAX_INT - 1
 // #endif
 #ifndef BUFFER_SIZE
-#define BUFFER_SIZE 42
+#define BUFFER_SIZE 10
 #endif
 
 // typedef struct s_list
