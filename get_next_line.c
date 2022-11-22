@@ -28,7 +28,7 @@ size_t	check_pos_nl(char *buf)
 
 size_t	check_char(char c, char *str)
 {
-	while (str && *str)
+	while (str && *str++)
 	{
 		if (*str == c)
 			return (1);
@@ -42,6 +42,7 @@ char	*cut_store(char *store, size_t pos, size_t store_len)
 
 	str = ft_strdup_gnl(store, pos, store_len);
 	free(store);
+	store = NULL;
 	return (str);
 }
 
@@ -50,7 +51,7 @@ char	*ft_free_null(char **line, char **rem, char **buf)
 	free(*line);
 	free(*rem);
 	free(*buf);
-	line = NULL;
+	*line = NULL;
 	*rem = NULL;
 	*buf = NULL;
 	return (NULL);
@@ -68,7 +69,9 @@ char	*append_buf(int fd, char *store, char *buf)
 			return (NULL);
 		buf[read_ret] = '\0';
 		store = ft_strjoin_gnl(store, buf);
-		if (check_char('\n', buf))
+		if (!store)
+			return (NULL);
+		if (store && check_char('\n', store))
 			return (store);
 	}
 	return (store);	
@@ -80,10 +83,26 @@ char	*find_line(char **store)
 	size_t	store_len;
 	char	*line;
 
-	pos = check_pos_nl(*store);
-	store_len = ft_strlen(*store);
-	line = ft_strdup_gnl(*store, 0, pos);
-	*store = cut_store(*store, pos, store_len);
+	line = NULL;
+	
+	if (store && *store && check_char('\n', *store))
+	{
+		pos = check_pos_nl(*store);
+		store_len = ft_strlen(*store);
+		line = ft_strdup_gnl(*store, 0, pos);
+		if (line == NULL)
+		{
+			free(*store);
+			return (line);
+		}
+		*store = cut_store(*store, pos, store_len);
+	}
+	else if (store && *store)
+	{
+		line = ft_strjoin_gnl(line, *store);
+		free(*store);
+		*store = NULL;
+	}
 	return (line);
 }
 
@@ -102,26 +121,41 @@ char	*get_next_line(int fd)
 	buf[BUFFER_SIZE] = '\0';		
 	store = append_buf(fd, store, buf);
 	if (!store)
-		ft_free_null(&line, &store, &buf);
-	line = find_line(&store);
-	free(buf);
+	{
+		// ft_free_null(&line, &store, &buf);
+		free(store);
+		free(buf);
+		return (NULL);
+	}
+	if (store && *store)
+		line = find_line(&store);
+	if (!line)
+	{
+		//ft_free_null(&line, &store, &buf);
+		free(store);
+		free(buf);
+		free(line);
+		return (NULL);
+	}
+	if (buf)
+		free(buf);
 	return (line);
 }
 
-int	main(void)
-{
-	int	fd;
-	int	i;
-	char *line;
+// int	main(void)
+// {
+// 	int	fd;
+// 	int	i;
+// 	char *line;
 	
-	fd = open("file", O_RDONLY);
-	i = 0;
+// 	fd = open("file", O_RDONLY);
+// 	i = 0;
 
-	while (i++ < 4)
-	{
-	line = get_next_line(fd);
-	printf("%s\n", line);
-	}
+// 	while (i++ < 19)
+// 	{
+// 	line = get_next_line(fd);
+// 	printf("%s\n", line);
+// 	}
 	
-	close(fd);
-}
+// 	close(fd);
+// }

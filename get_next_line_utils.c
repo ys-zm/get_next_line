@@ -56,8 +56,7 @@ char	*ft_strjoin_gnl(char *str, char *buf)
 	while (buf && buf[start])
 		joined[i++] = buf[start++];
 	joined[i] = '\0';
-	if (str)
-		free(str);
+	free(str);
 	return (joined);
 }
 
