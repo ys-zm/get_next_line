@@ -57,30 +57,40 @@ char	*ft_free_null(char **line, char **rem, char **buf)
 	return (NULL);
 }
 
-char	*append_buf(int fd, char **store, char *buf)
+// size_t	test_read(int fd, char *buf, int buf_size)
+// {
+// 	static int calls;
+// 	int ret;
+
+// 	ret = read(fd, buf, buf_size);
+// 	calls++;
+// 	if (calls >= 2)
+// 		return (-1);
+// 	return (ret);
+// }
+
+ssize_t	append_buf(int fd, char **store, char *buf)
 {
 	ssize_t	read_ret;
 	
 	read_ret = 1;
+	
 	while (read_ret)
 	{
 		read_ret = read(fd, buf, BUFFER_SIZE); 
-		//printf("read it once\n");
-		if (read_ret == -1)
-			return (NULL);
+		if (read_ret < 0)
+			return (-1);
 		if (read_ret == 0)
-			return (*store);
+			return (0);
 		buf[read_ret] = '\0';
-		// if (!*store)
-		// 	*store = ft_strdup_gnl("", 0, 0);
-		// else
+		if (read_ret > 0)
 			*store = ft_strjoin_gnl(*store, buf);
 		if (!*store)
-			return (NULL);
+			return (-1);
 		if (store && check_char('\n', *store))
-			return (*store);
+			return (0);
 	}
-	return (*store);	
+	return (0);	
 }
 
 char	*find_line(char **store)
@@ -97,7 +107,7 @@ char	*find_line(char **store)
 		line = ft_strdup_gnl(*store, 0, pos);
 		*store = cut_store(store, pos, store_len);
 	}
-	else if (store && *store)
+	else 
 	{
 		line = ft_strjoin_gnl(line, *store);
 		free(*store);
@@ -108,13 +118,14 @@ char	*find_line(char **store)
 
 char	*get_next_line(int fd)
 {
-	static char	*store = NULL;
+	static char	*store;
 	char		*line;
 	char		*buf;
-	char		*check;
+	ssize_t		check;
 
 	line = NULL;
-	if (read(fd, NULL, 0) == -1 || BUFFER_SIZE < 1 || BUFFER_SIZE > 2147483647)
+	check = 0;
+	if (fd < 0 || BUFFER_SIZE < 1 || BUFFER_SIZE > 2147483647)
 		return (NULL);
 	buf = malloc(sizeof(char) * (BUFFER_SIZE + 1));
 	if (!buf)
@@ -122,37 +133,46 @@ char	*get_next_line(int fd)
 		ft_free_null(&line, &store, &buf);
 		return (NULL);
 	}
-	buf[BUFFER_SIZE] = '\0';		
+	buf[BUFFER_SIZE] = '\0';	
 	check = append_buf(fd, &store, buf);
-	if (check == NULL)
+	if (check == -1)
 	{
 		ft_free_null(&line, &store, &buf);
 		return (NULL);
 	}
-		line = find_line(&store);
-	// if (!line)
-	// {
-	// 	ft_free_null(&line, &store, &buf);
-	// 	return (NULL);
-	// }
+	line = find_line(&store);
 	free(buf);
 	return (line);
 }
 
-int	main(void)
-{
-	int	fd;
-	int	i;
-	char *line;
+// int	main(void)
+// {
+// 	int	fd;
+// 	int	i;
+// 	char *line;
 	
-	fd = open("file", O_RDONLY);
-	i = 0;
+// 	fd = open("file", O_RDONLY);
+// 	i = 0;
 
-	while (i++ < 5)
-	{
-	line = get_next_line(fd);
-	printf("%s", line);
-	}
-	
-	close(fd);
-}
+// 	line = get_next_line(fd);
+// 	printf("%s", line);
+// 	free(line);
+// 	close(fd);
+// 	printf("|||fd is: %d\n", fd);
+// 	while (i++ < 2)
+// 	{
+// 	line = get_next_line(fd);
+// 	printf("%s", line);
+// 	free(line);
+// 	}
+
+// 	fd = open("file", O_RDONLY);
+// 	i = 0;
+// 	while (i++ < 4)
+// 	{
+// 	line = get_next_line(fd);
+// 	printf("%s", line);
+// 	free(line);
+// 	}
+// 	close(fd);
+// }
