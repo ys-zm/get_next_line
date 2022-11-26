@@ -10,7 +10,8 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "get_next_line.h" 
+#include "get_next_line_bonus.h" 
+
 
 size_t	ft_strlen(char *str)
 {
@@ -24,25 +25,14 @@ size_t	ft_strlen(char *str)
 	return (count);
 }
 
-// static size_t	check_empty_file(char *str, char *buf)
-// {
-// 	size_t	sum;
-
-// 	sum = ft_strlen(str) + ft_strlen(buf);
-// 	if (sum)
-// 		return (1);
-// 	return (0);
-// }
-
-char	*ft_free_null(char **line, char **rem, char **buf)
+static size_t	check_empty_file(char *str, char *buf)
 {
-	free(*line);
-	free(*rem);
-	free(*buf);
-	*line = NULL;
-	*rem = NULL;
-	*buf = NULL;
-	return (NULL);
+	size_t	sum;
+
+	sum = ft_strlen(str) + ft_strlen(buf);
+	if (sum)
+		return (1);
+	return (0);
 }
 
 char	*ft_strjoin_gnl(char *str, char *buf)
@@ -53,7 +43,7 @@ char	*ft_strjoin_gnl(char *str, char *buf)
 
 	start = 0;
 	i = 0;
-	if (ft_strlen(str) + ft_strlen(buf) == 0)
+	if (!check_empty_file(str, buf))
 		return (NULL);
 	joined = malloc(sizeof(char) * (ft_strlen(str) + ft_strlen(buf) + 1));
 	if (!joined)
