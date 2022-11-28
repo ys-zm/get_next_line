@@ -11,8 +11,6 @@
 /* ************************************************************************** */
 
 #include "get_next_line.h"
-#include <stdio.h>
-#include <limits.h>
 
 size_t	check_pos_nl(char *buf)
 {
@@ -37,18 +35,6 @@ size_t	check_char(char c, char *str)
 	return (0);
 }
 
-// size_t	test_read(int fd, char *buf, int buf_size)
-// {
-// 	static int calls;
-// 	int ret;
-
-// 	ret = read(fd, buf, buf_size);
-// 	calls++;
-// 	if (calls >= 2)
-// 		return (-1);
-// 	return (ret);
-// }
-
 ssize_t	append_buf(int fd, char **store, char *buf)
 {
 	ssize_t	read_ret;
@@ -63,8 +49,10 @@ ssize_t	append_buf(int fd, char **store, char *buf)
 			return (0);
 		buf[read_ret] = '\0';
 		if (read_ret > 0)
+		{
 			*store = ft_strjoin_gnl(*store, buf);
-		if (!*store)
+		}
+		if (*store == NULL)
 			return (-1);
 		if (store && check_char('\n', *store))
 			return (0);
@@ -104,26 +92,25 @@ char	*get_next_line(int fd)
 	static char	*store;
 	char		*line;
 	char		*buf;
-	ssize_t		check;
 
 	line = NULL;
-	check = 0;
 	if (fd < 0 || BUFFER_SIZE < 1 || BUFFER_SIZE > 2147483647)
 		return (NULL);
 	buf = malloc(sizeof(char) * (BUFFER_SIZE + 1));
 	if (!buf)
-	{
-		ft_free_null(&line, &store, &buf);
 		return (NULL);
-	}
 	buf[BUFFER_SIZE] = '\0';
-	check = append_buf(fd, &store, buf);
-	if (check == -1)
+	if (append_buf(fd, &store, buf) == -1)
 	{
 		ft_free_null(&line, &store, &buf);
 		return (NULL);
 	}
 	line = find_line(&store);
+	if (line == NULL)
+	{
+		ft_free_null(&line, &store, &buf);
+		return (NULL);
+	}
 	free(buf);
 	return (line);
 }

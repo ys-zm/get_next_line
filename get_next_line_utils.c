@@ -24,15 +24,15 @@ size_t	ft_strlen(char *str)
 	return (count);
 }
 
-// static size_t	check_empty_file(char *str, char *buf)
-// {
-// 	size_t	sum;
+static size_t	check_empty_file(char *str, char *buf)
+{
+	size_t	sum;
 
-// 	sum = ft_strlen(str) + ft_strlen(buf);
-// 	if (sum)
-// 		return (1);
-// 	return (0);
-// }
+	sum = ft_strlen(str) + ft_strlen(buf);
+	if (sum)
+		return (1);
+	return (0);
+}
 
 char	*ft_free_null(char **line, char **rem, char **buf)
 {
@@ -53,7 +53,7 @@ char	*ft_strjoin_gnl(char *str, char *buf)
 
 	start = 0;
 	i = 0;
-	if (ft_strlen(str) + ft_strlen(buf) == 0)
+	if (!check_empty_file(str, buf))
 		return (NULL);
 	joined = malloc(sizeof(char) * (ft_strlen(str) + ft_strlen(buf) + 1));
 	if (!joined)
@@ -66,8 +66,7 @@ char	*ft_strjoin_gnl(char *str, char *buf)
 	while (buf && buf[start])
 		joined[i++] = buf[start++];
 	joined[i] = '\0';
-	if (str)
-		free(str);
+	free(str);
 	return (joined);
 }
 

@@ -12,7 +12,6 @@
 
 #include "get_next_line_bonus.h" 
 
-
 size_t	ft_strlen(char *str)
 {
 	size_t	count;
@@ -33,6 +32,17 @@ static size_t	check_empty_file(char *str, char *buf)
 	if (sum)
 		return (1);
 	return (0);
+}
+
+char	*ft_free_null(char **line, char **rem, char **buf)
+{
+	free(*line);
+	free(*rem);
+	free(*buf);
+	*line = NULL;
+	*rem = NULL;
+	*buf = NULL;
+	return (NULL);
 }
 
 char	*ft_strjoin_gnl(char *str, char *buf)

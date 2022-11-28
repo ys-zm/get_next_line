@@ -28,14 +28,6 @@
 #define BUFFER_SIZE 100000
 #endif
 
-// typedef struct s_list
-// {
-// 	char	buf[BUFFER_SIZE + 1];
-// 	size_t	index;
-// 	int		fd;
-// 	struct s_list	*next;
-// }	t_file;
-
 char	*get_next_line(int fd);
 
 char	*ft_strjoin_gnl(char *line, char *buf);
@@ -47,6 +39,3 @@ size_t	ft_strlen(char *str);
 char	*ft_free_null(char **line, char **rem, char **buf);
 
 #endif
-
-
-//array of structs. 

@@ -11,8 +11,6 @@
 /* ************************************************************************** */
 
 #include "get_next_line_bonus.h"
-#include <stdio.h>
-#include <limits.h>
 
 size_t	check_pos_nl(char *buf)
 {
@@ -45,29 +43,6 @@ char	*cut_store(char **store, size_t pos, size_t store_len)
 	free(*store);
 	return (str);
 }
-
-char	*ft_free_null(char **line, char **rem, char **buf)
-{
-	free(*line);
-	free(*rem);
-	free(*buf);
-	*line = NULL;
-	*rem = NULL;
-	*buf = NULL;
-	return (NULL);
-}
-
-// size_t	test_read(int fd, char *buf, int buf_size)
-// {
-// 	static int calls;
-// 	int ret;
-
-// 	ret = read(fd, buf, buf_size);
-// 	calls++;
-// 	if (calls >= 2)
-// 		return (-1);
-// 	return (ret);
-// }
 
 ssize_t	append_buf(int fd, char **store, char *buf)
 {
@@ -118,31 +93,23 @@ char	*find_line(char **store)
 
 char	*get_next_line(int fd)
 {
-	static t_file node;
+	static char	*store[OPEN_MAX];
 	char		*line;
 	char		*buf;
-	ssize_t		check;
 
 	line = NULL;
-	check = 0;
 	if (fd < 0 || BUFFER_SIZE < 1 || BUFFER_SIZE > 2147483647)
 		return (NULL);
-    node = malloc(sizeof(t_file));
-	node->fd = fd;
 	buf = malloc(sizeof(char) * (BUFFER_SIZE + 1));
 	if (!buf)
-	{
-		ft_free_null(&line, &node->store, &buf);
 		return (NULL);
-	}
 	buf[BUFFER_SIZE] = '\0';	
-	check = append_buf(fd, &node->store, buf);
-	if (check == -1)
+	if (append_buf(fd, &store[fd], buf) == -1)
 	{
-		ft_free_null(&line, &node->store, &buf);
+		ft_free_null(&line, &store[fd], &buf);
 		return (NULL);
 	}
-	line = find_line(&node->store);
+	line = find_line(&store[fd]);
 	free(buf);
 	return (line);
 }
