@@ -6,27 +6,28 @@
 /*   By: yzaim <marvin@codam.nl>                      +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/11/08 12:20:43 by yzaim         #+#    #+#                 */
-/*   Updated: 2022/11/11 14:49:50 by yzaim         ########   odam.nl         */
+/*   Updated: 2022/11/30 12:42:17 by yzaim         ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
 #ifndef GET_NEXT_LINE_BONUS_H
-#define GET_NEXT_LINE_BONUS_H
+# define GET_NEXT_LINE_BONUS_H
 
-#include <stdlib.h>
-#include <stdio.h>
-#include <unistd.h>
-#include <fcntl.h>
-#include <string.h>
-#include <limits.h>
+# include <stdlib.h>
+# include <stdio.h>
+# include <unistd.h>
+# include <fcntl.h>
+# include <string.h>
+# include <limits.h>
 
 // #ifdef BUFFER_SIZE > MAX_INT - 1
 // #undef BUFFER_SIZE
 // #define BUFFER_SIZE MAX_INT - 1
 // #endif
-#ifndef BUFFER_SIZE
-#define BUFFER_SIZE 100000
-#endif
+
+# ifndef BUFFER_SIZE
+#  define BUFFER_SIZE 100000
+# endif
 
 char	*get_next_line(int fd);
 
@@ -39,6 +40,3 @@ size_t	ft_strlen(char *str);
 char	*ft_free_null(char **line, char **rem, char **buf);
 
 #endif
-
-
-//array of structs. 

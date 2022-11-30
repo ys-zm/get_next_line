@@ -57,7 +57,9 @@ char	*ft_strjoin_gnl(char *str, char *buf)
 		return (NULL);
 	joined = malloc(sizeof(char) * (ft_strlen(str) + ft_strlen(buf) + 1));
 	if (!joined)
+	{
 		return (NULL);
+	}
 	while (str && str[i])
 	{
 		joined[i] = str[i];

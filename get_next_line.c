@@ -6,7 +6,7 @@
 /*   By: yzaim <marvin@codam.nl>                      +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/11/08 12:19:49 by yzaim         #+#    #+#                 */
-/*   Updated: 2022/11/14 13:00:26 by yzaim         ########   odam.nl         */
+/*   Updated: 2022/11/30 13:00:29 by yzaim         ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -43,15 +43,11 @@ ssize_t	append_buf(int fd, char **store, char *buf)
 	while (read_ret)
 	{
 		read_ret = read(fd, buf, BUFFER_SIZE);
-		if (read_ret < 0)
-			return (-1);
-		if (read_ret == 0)
-			return (0);
+		if (read_ret <= 0)
+			return (read_ret);
 		buf[read_ret] = '\0';
 		if (read_ret > 0)
-		{
 			*store = ft_strjoin_gnl(*store, buf);
-		}
 		if (*store == NULL)
 			return (-1);
 		if (store && check_char('\n', *store))
@@ -63,7 +59,6 @@ ssize_t	append_buf(int fd, char **store, char *buf)
 char	*find_line(char **store)
 {
 	size_t	pos;
-	size_t	store_len;
 	char	*line;
 	char	*store_temp;
 
@@ -72,9 +67,8 @@ char	*find_line(char **store)
 	if (store && *store && check_char('\n', *store))
 	{
 		pos = check_pos_nl(*store);
-		store_len = ft_strlen(*store);
 		line = ft_strdup_gnl(*store, 0, pos);
-		store_temp = ft_strdup_gnl(*store, pos, store_len);
+		store_temp = ft_strdup_gnl(*store, pos, ft_strlen(*store));
 		free(*store);
 		*store = store_temp;
 	}
@@ -100,7 +94,7 @@ char	*get_next_line(int fd)
 	if (!buf)
 		return (NULL);
 	buf[BUFFER_SIZE] = '\0';
-	if (append_buf(fd, &store, buf) == -1)
+	if (append_buf(fd, &store, buf) < 0)
 	{
 		ft_free_null(&line, &store, &buf);
 		return (NULL);
@@ -118,31 +112,15 @@ char	*get_next_line(int fd)
 // int	main(void)
 // {
 // 	int	fd;
-// 	int	i;
+// 	//int	i;
 // 	char *line;
 
 // 	fd = open("file", O_RDONLY);
-// 	i = 0;
+// 	//i = 0;
 
 // 	line = get_next_line(fd);
 // 	printf("%s", line);
-// 	free(line);
-// 	close(fd);
-// 	printf("|||fd is: %d\n", fd);
-// 	while (i++ < 2)
-// 	{
 // 	line = get_next_line(fd);
 // 	printf("%s", line);
-// 	free(line);
-// 	}
 
-// 	fd = open("file", O_RDONLY);
-// 	i = 0;
-// 	while (i++ < 4)
-// 	{
-// 	line = get_next_line(fd);
-// 	printf("%s", line);
-// 	free(line);
-// 	}
-// 	close(fd);
 // }
